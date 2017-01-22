@@ -14,6 +14,6 @@ setup(name='anthill_tools',
       author='desertkun',
       author_email='desertkun@gmail.com',
       license='MIT',
-      packages=['anthill_tools'],
+      packages=['anthill_tools', 'anthill_tools.admin', 'anthill_tools.admin.dlc'],
       zip_safe=False,
       install_requires=['requests'])
