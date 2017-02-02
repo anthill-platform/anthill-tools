@@ -220,6 +220,13 @@ class Admin(Service):
     def __init__(self, location):
         super(Admin, self).__init__(location)
 
+    @staticmethod
+    def find_entry(response, entry_id):
+        for entry in response:
+            if entry.get("id") == entry_id:
+                return entry
+        return None
+
     def api_get(self, service, action, context):
         result = get(self.location + "/api", params={
             "access_token": Login.TOKEN,

@@ -8,7 +8,7 @@ Tool set to communicate with anthill platform
 pip install git+https://github.com/anthill-services/anthill-tools.git
 ```
 
-### DLC content deployment
+# DLC content deployment
 
 This configurations allows to deliver various bundles onto DLC service:
 
@@ -56,5 +56,42 @@ deployer.deploy(
             "settings": {}
         }
     }
+}
+```
+
+# Exec functions synchronization
+
+This configurations allows to deliver various scripts (functions) onto exec service:
+
+`sync.py`:
+```python
+
+from anthill_tools.admin._exec import sync
+
+sync.sync(
+    "http://environment-dev.anthill",
+    "test",
+    "1.0",
+    "root",
+    "scripts.json",
+    username="<username>",
+    password="<password>")
+
+```
+
+`scripts.json`:
+
+```json
+{
+  "functions": {
+    "utils": {
+      "path": "utils.js",
+      "imports": []
+    },
+    "game": {
+      "path": "game.js",
+      "imports": ["utils"]
+    }
+  }
 }
 ```
