@@ -55,17 +55,7 @@ class Deliverer(object):
     def deliver(self):
         log("Authenticating...")
 
-        username = self.username or os.environ.get("ANTHILL_USERNAME")
-
-        if not username:
-            raise DeliverError("Please define ANTHILL_USERNAME environment variable.")
-
-        password = self.password or os.environ.get("ANTHILL_PASSWORD")
-
-        if not password:
-            raise DeliverError("Please define ANTHILL_PASSWORD environment variable.")
-
-        self.login.auth_dev(username, password, ["admin", "game_deploy_admin"], options={
+        self.login.auth_dev(self.username, self.password, ["admin", "game_deploy_admin"], options={
             "as": "deployer"
         })
 
@@ -98,14 +88,29 @@ if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option("-e", "--environment", type="string", dest="environment_location",
                       help="Environment Service Location")
-    parser.add_option("-n", "--name", type="string", dest="application_name", help="Application Name")
-    parser.add_option("-v", "--version", type="string", dest="application_version", help="Application Version")
-    parser.add_option("-g", "--gamespace", type="string", dest="gamespace", help="Gamespace")
-    parser.add_option("-f", "--filename", type="string", dest="filename", help="A filename to deploy")
-    parser.add_option("-s", "--switch", type="string", dest="switch_to_new", default="true",
-                      help="Switch application to deployed version automatically")
+    parser.add_option("-n", "--name", type="string", dest="application_name",
+                      help="Application Name")
+    parser.add_option("-v", "--version", type="string", dest="application_version",
+                      help="Application Version")
+    parser.add_option("-g", "--gamespace", type="string", dest="gamespace",
+                      help="Gamespace")
+    parser.add_option("-f", "--filename", type="string", dest="filename",
+                      help="A filename to deploy")
+    parser.add_option("-u", "--username", type="string", dest="anthill_username",
+                      help="Anthill Username", default=os.environ.get("ANTHILL_USERNAME"))
+    parser.add_option("-p", "--password", type="string", dest="anthill_password",
+                      help="Anthill Password", default=os.environ.get("ANTHILL_PASSWORD"))
+    parser.add_option("-s", "--switch", type="string", dest="switch_to_new",
+                      help="Switch application to deployed version automatically", default="true")
 
     (options, args) = parser.parse_args()
+
+    defaults = vars(parser.get_default_values())
+
+    for k, v in vars(options).items():
+        if v is None and defaults.get(k) is None:
+            parser.print_help()
+            exit(1)
 
     try:
         deploy(
@@ -114,7 +119,9 @@ if __name__ == "__main__":
             application_version=options.application_version,
             gamespace=options.gamespace,
             filename=options.filename,
-            switch=options.switch_to_new)
+            switch=options.switch_to_new,
+            username=options.anthill_username,
+            password=options.anthill_password)
     except DeliverError as e:
         print "ERROR: " + e.message
         exit(1)

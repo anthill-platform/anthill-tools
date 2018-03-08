@@ -5,14 +5,32 @@ Tool set to communicate with anthill platform
 ### Installation
 
 ```bash
-pip install git+https://github.com/anthill-services/anthill-tools.git
+pip install git+https://github.com/anthill-platform/anthill-tools.git
 ```
+
+# Authentication
+
+Each of the tools below require authentication. Easiest way would be define `ANTHILL_USERNAME` and
+`ANTHILL_PASSWORD` environment variables before making the call. But you can also pass
+these via `--username` and `--password` command line arguments, but you are exposing these in that case.
 
 # DLC content deployment
 
-This configurations allows to deliver various bundles onto DLC service:
+This configurations allows to deliver various bundles onto DLC service.
 
-`deploy.py`:
+Command line usage:
+
+```bash
+python -m anthill_tools.admin.dlc.deployer \
+  --environment="<environment location>" \
+  --name="<game name>" \
+  --version="<game version>" \
+  --gamespace="<gamespace name>" \
+  --config "<JSON configuration file>.json"
+```
+
+Python usage:
+
 ```python
 
 from anthill_tools.admin.dlc import deployer
@@ -22,13 +40,13 @@ deployer.deploy(
     "test",
     "1.0",
     "root",
-    "test.json",
+    "<JSON configuration file>.json",
     username="<username>",
     password="<password>")
 
 ```
 
-`test.json`:
+The bundles to deliver are read from the JSON configuration file. Example of that file:
 
 ```json
 {
@@ -61,11 +79,23 @@ deployer.deploy(
 
 # Game Servers deployment
 
-This configurations allows to deliver Game Server code onto Game Master service:
+This configurations allows to deliver Game Server builds onto Game Master service.
+Each build should be packed into a zip file before deployment.
 
-`deploy.py`:
+Command line usage:
+
+```bash
+python -m anthill_tools.admin.game.deployer \
+  --environment="<environment location>" \
+  --name="<game name>" \
+  --version="<game version>" \
+  --gamespace="<gamespace name>" \
+  --filename "<game server files packed into one zip file"
+```
+
+Python usage:
+
 ```python
-
 from anthill_tools.admin.game import deployer
 
 deployer.deploy(
@@ -77,5 +107,4 @@ deployer.deploy(
     switch="true",
     username="<username>",
     password="<password>")
-
 ```
