@@ -252,17 +252,18 @@ class Admin(Service):
 
         return result
 
-    def api_put(self, service, action, context, data):
+    def api_put(self, service, action, context, data, args=None, **kwargs):
 
-        args = {
+        request_args = {
             "access_token": Login.TOKEN,
             "service": service,
             "context": json.dumps(context),
-            "action": action
+            "action": action,
+            "args": json.dumps(args) if args else "{}"
         }
 
         try:
-            result = put(self.location + "/service/upload?" + urllib.urlencode(args), data=data)
+            result = put(self.location + "/service/upload?" + urllib.urlencode(request_args), data=data, **kwargs)
         except ServiceError as e:
             if e.code == 444:
                 return e.response

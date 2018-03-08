@@ -59,39 +59,23 @@ deployer.deploy(
 }
 ```
 
-# Exec functions synchronization
+# Game Servers deployment
 
-This configurations allows to deliver various scripts (functions) onto exec service:
+This configurations allows to deliver Game Server code onto Game Master service:
 
-`sync.py`:
+`deploy.py`:
 ```python
 
-from anthill_tools.admin._exec import sync
+from anthill_tools.admin.game import deployer
 
-sync.sync(
+deployer.deploy(
     "http://environment-dev.anthill",
     "test",
     "1.0",
     "root",
-    "scripts.json",
+    "game_server.zip",
+    switch="true",
     username="<username>",
     password="<password>")
 
-```
-
-`scripts.json`:
-
-```json
-{
-  "functions": {
-    "utils": {
-      "path": "utils.js",
-      "imports": []
-    },
-    "game": {
-      "path": "game.js",
-      "imports": ["utils"]
-    }
-  }
-}
 ```

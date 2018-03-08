@@ -12,14 +12,14 @@ def log(data):
     print data
 
 
-def sha256(file_name):
-    hash_sha256 = hashlib.sha256()
+def md5(file_name):
+    hash_ = hashlib.md5()
 
     with open(file_name, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
-            hash_sha256.update(chunk)
+            hash_.update(chunk)
 
-    return hash_sha256.hexdigest()
+    return hash_.hexdigest()
 
 
 def sizeof_fmt(num, suffix='B'):
@@ -76,7 +76,7 @@ class Bundle(object):
         bundle_path = self.path
         if not os.path.isfile(bundle_path):
             raise DeliverError("Bundle {0} cannot be found!".format(bundle_path))
-        self.hash = sha256(bundle_path)
+        self.hash = md5(bundle_path)
         self.size = os.path.getsize(bundle_path)
 
 
