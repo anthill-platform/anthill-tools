@@ -1,18 +1,18 @@
 
 import requests
 import json
-import urllib
+from urllib.parse import urlencode
 
 
 def log(s):
-    print s
+    print(s)
 
 
 def get(url, params=None, **kwargs):
     try:
         response = requests.get(url, params=params, **kwargs)
     except requests.ConnectionError as e:
-        raise ServiceError(599, e.message)
+        raise ServiceError(599, str(e))
 
     if response.status_code >= 300:
         raise ServiceError(response.status_code, response.text, response)
@@ -24,7 +24,7 @@ def post(url, data=None, **kwargs):
     try:
         response = requests.post(url, data=data, **kwargs)
     except requests.ConnectionError as e:
-        raise ServiceError(599, e.message)
+        raise ServiceError(599, str(e))
 
     if response.status_code >= 300:
         raise ServiceError(response.status_code, response.text, response)
@@ -36,7 +36,7 @@ def put(url, data=None, **kwargs):
     try:
         response = requests.put(url, data=data, **kwargs)
     except requests.ConnectionError as e:
-        raise ServiceError(599, e.message)
+        raise ServiceError(599, str(e))
 
     if response.status_code >= 300:
         raise ServiceError(response.status_code, response.text, response)
@@ -134,7 +134,7 @@ class Discovery(Service):
         response = get(self.location + "/services/" + ",".join(to_request))
         response_json = response.json()
 
-        for service_id, location in response_json.iteritems():
+        for service_id, location in response_json.items():
             _args, _kwargs = args.get(service_id, ([], {}))
             service = Services.new_service(service_id, location, *_args, **_kwargs)
             self.cache[service_id] = service
@@ -263,7 +263,7 @@ class Admin(Service):
         }
 
         try:
-            result = put(self.location + "/service/upload?" + urllib.urlencode(request_args), data=data, **kwargs)
+            result = put(self.location + "/service/upload?" + urlencode(request_args), data=data, **kwargs)
         except ServiceError as e:
             if e.code == 444:
                 return e.response

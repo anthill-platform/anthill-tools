@@ -9,7 +9,7 @@ from optparse import OptionParser
 
 
 def log(data):
-    print data
+    print(data)
 
 
 def md5(file_name):
@@ -53,7 +53,7 @@ def ask(question, default="yes"):
 
     while True:
         sys.stdout.write(question + prompt)
-        choice = raw_input().lower()
+        choice = input().lower()
         if default is not None and choice == '':
             return valid[default]
         elif choice in valid:
@@ -108,7 +108,7 @@ class Deliverer(object):
             if not isinstance(config["bundles"], dict):
                 raise DeliverError("bundles should be a dict")
 
-            for name, config_bundle in config["bundles"].iteritems():
+            for name, config_bundle in config["bundles"].items():
                 if "path" not in config_bundle:
                     raise DeliverError("Bundle has no path option")
 
@@ -155,7 +155,7 @@ class Deliverer(object):
                 if e.code == 404:
                     self.upload_bundles.append(bundle)
                 else:
-                    raise DeliverError("Failed to check bundle {0}: {1}".format(bundle.name, e.message))
+                    raise DeliverError("Failed to check bundle {0}: {1}".format(bundle.name, str(e)))
             else:
                 self.attach_bundles.append(bundle)
 
@@ -310,5 +310,5 @@ if __name__ == "__main__":
             password=options.anthill_password,
             force=options.force)
     except DeliverError as e:
-        print "ERROR: " + e.message
+        print("ERROR: " + str(e))
         exit(1)

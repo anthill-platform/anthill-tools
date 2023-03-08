@@ -6,7 +6,7 @@ from anthill_tools import Environment, Login, Admin, ApplicationInfo
 
 
 def log(data):
-    print data
+    print(data)
 
 class DeliverError(Exception):
     def __init__(self, message):
@@ -123,5 +123,5 @@ if __name__ == "__main__":
             username=options.anthill_username,
             password=options.anthill_password)
     except DeliverError as e:
-        print "ERROR: " + e.message
+        print("ERROR: " + str(e))
         exit(1)

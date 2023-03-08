@@ -5,7 +5,7 @@ Tool set to communicate with anthill platform
 ### Installation
 
 ```bash
-pip install git+https://github.com/anthill-platform/anthill-tools.git
+pip3 install git+https://github.com/anthill-platform/anthill-tools.git
 ```
 
 # Authentication
@@ -21,7 +21,7 @@ This configurations allows to deliver various bundles onto DLC service.
 Command line usage:
 
 ```bash
-python -m anthill_tools.admin.dlc.deployer \
+python3 -m anthill_tools.admin.dlc.deployer \
   --environment="<environment location>" \
   --name="<game name>" \
   --version="<game version>" \
