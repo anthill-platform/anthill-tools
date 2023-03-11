@@ -1,4 +1,3 @@
-
 import os
 from optparse import OptionParser
 
@@ -7,6 +6,7 @@ from anthill_tools import Environment, Login, Admin, ApplicationInfo
 
 def log(data):
     print(data)
+
 
 class DeliverError(Exception):
     def __init__(self, message):
@@ -36,6 +36,9 @@ class Deliverer(object):
         self.admin = None
         self.game = None
 
+        self.create_version_name = None
+        self.create_version_env = None
+
         self.init()
 
     def init(self):
@@ -52,12 +55,33 @@ class Deliverer(object):
         self.admin = services[Admin.ID]
         self.game = services["game"]
 
+    def create_version(self, version_name, create_version_env):
+        self.create_version_name = version_name
+        self.create_version_env = create_version_env
+
     def deliver(self):
         log("Authenticating...")
 
-        self.login.auth_dev(self.username, self.password, ["admin", "game_deploy_admin"], options={
+        rights = ["admin", "game_deploy_admin"]
+        if self.create_version_name:
+            rights.append("env_admin")
+
+        self.login.auth_dev(self.username, self.password, rights, options={
             "as": "deployer"
         })
+
+        if self.create_version_name:
+            log("Creating new version {0} for dev {1}...".format(self.create_version_name, self.create_version_env))
+
+            try:
+                self.admin.api_post("environment", "new_app_version", "create", {
+                    "app_id": self.app_info.app_name
+                }, {
+                    "version_name": self.create_version_name,
+                    "version_env": self.create_version_env
+                })
+            except Exception as e:
+                log("Version was not created (already exist?)")
 
         log("Deploying...")
 
@@ -65,6 +89,7 @@ class Deliverer(object):
             self.admin.api_put("game", "deploy", {
                 "game_name": self.app_info.app_name,
                 "game_version": self.app_info.app_version
+                if self.create_version_name is None else self.create_version_name
             }, f, args={
                 "switch_to_new": self.switch
             }, headers={
@@ -75,11 +100,15 @@ class Deliverer(object):
 
 
 def deploy(environment_location, application_name, application_version,
-           gamespace, filename, switch, username=None, password=None):
-
+           gamespace, filename, switch, username=None, password=None,
+           create_version=None, create_version_env=None):
     app_info = ApplicationInfo(application_name, application_version, gamespace)
 
     d = Deliverer(environment_location, app_info, filename, switch, username=username, password=password)
+
+    if create_version and create_version_env:
+        d.create_version(create_version, create_version_env)
+
     d.deliver()
 
 
@@ -92,6 +121,10 @@ if __name__ == "__main__":
                       help="Application Name")
     parser.add_option("-v", "--version", type="string", dest="application_version",
                       help="Application Version")
+    parser.add_option("--create-version", type="string", default="", dest="create_version",
+                      help="Create a new version")
+    parser.add_option("--create-version-env", type="string", default="", dest="create_version_env",
+                      help="Environment for new version")
     parser.add_option("-g", "--gamespace", type="string", dest="gamespace",
                       help="Gamespace")
     parser.add_option("-f", "--filename", type="string", dest="filename",
@@ -117,6 +150,8 @@ if __name__ == "__main__":
             environment_location=options.environment_location,
             application_name=options.application_name,
             application_version=options.application_version,
+            create_version=options.create_version,
+            create_version_env=options.create_version_env,
             gamespace=options.gamespace,
             filename=options.filename,
             switch=options.switch_to_new,

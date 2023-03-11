@@ -7,7 +7,7 @@ def readme():
 
 
 setup(name='anthill_tools',
-      version='0.3',
+      version='0.3.2',
       description='Tool set to communicate with anthill platform',
       long_description=readme(),
       url='https://github.com/anthill-platform/anthill-tools',
